@@ -33,15 +33,15 @@ int main(int n_arginput, char *argv[])
 	   
 	} else if (n_arg >=4 && n_arg < 6){
 		
-		p_value = stoi(argv[1]);
-		q_value = stoi(argv[2]);
+		p = stoi(argv[1]);
+		q = stoi(argv[2]);
 		b = stoi(argv[3]);		
 		c = stoi(argv[4]);
 		
 	} else {
 		
-		p_value = stoi(argv[1]);
-		q_value = stoi(argv[2]);
+		p = stoi(argv[1]);
+		q = stoi(argv[2]);
 		b = stoi(argv[3]);		//convertire da stringa input a int
 		c = stoi(argv[4]);
 		id_vertice1 = stoi(argv[5]);
@@ -49,11 +49,11 @@ int main(int n_arginput, char *argv[])
 	}
 	
 	//controllo p e q
-	if (p_value != 3 && p_value != 4 && p_value != 5) { 
+	if (p != 3 && p != 4 && p != 5) { 
 		cerr << "Error: p must be in range 3,4,5" << endl; 
 		return 1; }	
 		
-	if (q_value != 3 && q_value != 4 && q_value != 5) {
+	if (q != 3 && q != 4 && q != 5) {
 		cerr << "Error: q must be in range 3,4,5" << endl; 
 		return 1; }	
 		
@@ -82,10 +82,10 @@ int main(int n_arginput, char *argv[])
 	
 	//stampa 
 	if (n_arg >=4 && n_arg < 6) {
-		cout << "(p, q, b, c) = (" << p_value << ", " << q_value << ", " << b << ", " << c << ")" << endl;
+		cout << "(p, q, b, c) = (" << p << ", " << q << ", " << b << ", " << c << ")" << endl;
 	
 	} else if (n_arg >=7) {
-		cout << "(p, q, b, c, id_vertice1, id_vertice2) = (" << p_value << ", " << q_value << ", " << b << ", " << c << ", " << id_vertice1 << ", " << id_vertice2 << ")" << endl;
+		cout << "(p, q, b, c, id_vertice1, id_vertice2) = (" << p << ", " << q << ", " << b << ", " << c << ", " << id_vertice1 << ", " << id_vertice2 << ")" << endl;
 	}
 		
 	
@@ -93,20 +93,20 @@ int main(int n_arginput, char *argv[])
 	// chiamata alla costruzione del solido platonico di partenza
 	string InputFile = "../SolidiPlatonici";
 	PolyhedronMesh PlatonicPolyhedron;
-	switch(q_value) {
+	switch(q) {
 		case 3:
 			// tetraedro
-			cout << "The platonic polyhedron corresponding to {3, " << q_value << "} is a tetrahedron" << endl;
+			cout << "The platonic polyhedron corresponding to {3, " << q << "} is a tetrahedron" << endl;
 			InputFile += "/tetrahedron/";
 			break;
 		case 4:
 			// ottaedro
-			cout << "The platonic polyhedron corresponding to {3, " << q_value << "} is a octahedron" << endl;
+			cout << "The platonic polyhedron corresponding to {3, " << q << "} is a octahedron" << endl;
 			InputFile += "/octahedron/";
 			break;
 		case 5:
 			// icosaedro
-			cout << "The platonic polyhedron corresponding to {3, " << q_value << "} is a icosahedron" << endl;
+			cout << "The platonic polyhedron corresponding to {3, " << q << "} is a icosahedron" << endl;
 			InputFile += "/icosahedron/";
 			break;
 	}
@@ -116,6 +116,5 @@ int main(int n_arginput, char *argv[])
 		return 1;
 	}
 	
-	cout<<"ciao"<<endl;
 	return 0;
 }
