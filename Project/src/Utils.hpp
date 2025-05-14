@@ -2,7 +2,7 @@
 #include <sstream>
 #include "PolyhedronMesh.hpp"
 
-//using namespace std;
+using namespace std;
 
 
 bool ImportPolyhedronMesh(PolyhedronMesh& polyhedron, 

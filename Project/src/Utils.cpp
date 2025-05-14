@@ -1,11 +1,8 @@
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
 
 #include "Eigen/Eigen"
-
-
 #include"utils.hpp"
 
 using namespace Eigen;
@@ -67,20 +64,9 @@ bool ImportCell0Ds(PolyhedronMesh& polyhedron, const string& InputFile)
 		polyhedron.Cell0DsId.push_back(id);
 		
 		}
-		
-	cout << "=== Vertici (Cell0Ds) ===" << endl;
-	for (unsigned int i = 0; i < polyhedron.NumCell0Ds; ++i) {
-		unsigned int id = polyhedron.Cell0DsId[i];
-		double x = polyhedron.Cell0DsCoordinates(0, id);
-		double y = polyhedron.Cell0DsCoordinates(1, id);
-		double z = polyhedron.Cell0DsCoordinates(2, id);
-		cout << "ID " << id << ": (" << x << ", " << y << ", " << z << ")" << endl;
-	}
-		
-		
-	return true;
-		
 	
+		
+	return true;	
 }
 
 /************************************/
@@ -123,8 +109,9 @@ bool ImportCell1Ds(PolyhedronMesh& polyhedron, const string& InputFile)
 		unsigned int id;
 		unsigned int Origin;
 		unsigned int End;
+		char separatore;
 		
-		is_line >> id >> Origin >> End;
+		is_line >> id >> separatore >> Origin >> separatore >> End;
 		
 		
 		// TEST: verify edge zero-length
@@ -139,6 +126,7 @@ bool ImportCell1Ds(PolyhedronMesh& polyhedron, const string& InputFile)
 		polyhedron.Cell1DsId.push_back(id);
 	
 	}
+	
 	return true;
 }
 
@@ -180,6 +168,7 @@ bool ImportCell2Ds(PolyhedronMesh& polyhedron, const string& InputFile)
 		
 		istringstream is_line(line);
 		unsigned int id;
+		char separatore;
 		
 		is_line >> id;
 		
@@ -188,7 +177,7 @@ bool ImportCell2Ds(PolyhedronMesh& polyhedron, const string& InputFile)
 		// memorizzo i vertici e gli spigoli
 		vector<unsigned int> vertices(3);
 		for(unsigned int i = 0; i < 3; i++)
-			is_line >> vertices[i];
+			is_line >> vertices[i] >> separatore;
 		polyhedron.Cell2DsVertices.push_back(vertices);
 		
 		vector<unsigned int> edges(3);
@@ -216,8 +205,8 @@ bool check_area_3d(PolyhedronMesh& polyhedron) {
         for (unsigned int j = 0; j < n; j++) {
             // Get the IDs of the points which form the i-th polygon.
             unsigned int& P1_id = polyhedron.Cell2DsVertices[i][j];
-            unsigned int& P2_id = polyhedron.Cell2DsVertices[i][(j + 1) % n]; // Wrap around to the first vertex
-            unsigned int& P3_id = polyhedron.Cell2DsVertices[i][(j + 2) % n]; // Need a third point for triangle
+            unsigned int& P2_id = polyhedron.Cell2DsVertices[i][(j + 1) % n]; 
+            unsigned int& P3_id = polyhedron.Cell2DsVertices[i][(j + 2) % n]; 
 
             // Get the 3D coordinates of the vertices.
             double X_P1 = polyhedron.Cell0DsCoordinates(0, P1_id);
