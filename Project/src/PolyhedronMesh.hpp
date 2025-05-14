@@ -25,3 +25,5 @@ struct PolyhedronMesh
 	vector<unsigned int> Cell2DsNumEdges = {};				// numero spigoli (per ciascuna faccia)
 	vector<vector<unsigned int>>  Cell2DsVertices= {};		// id vertici (per ciascuna faccia)
 	vector<vector<unsigned int>> Cell2DsEdges = {};			// id spigoli (per ciascuna faccia)
+	
+};
