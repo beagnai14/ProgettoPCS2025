@@ -71,6 +71,7 @@ bool ImportCell0Ds(PolyhedronMesh& polyhedron, const string& InputFile)
 
 /************************************/
 
+
 bool ImportCell1Ds(PolyhedronMesh& polyhedron, const string& InputFile)
 {
 	ifstream file(InputFile);
@@ -190,8 +191,7 @@ bool ImportCell2Ds(PolyhedronMesh& polyhedron, const string& InputFile)
 	return true;
 }
 
-/*	
-
+/*
 bool check_area_3d(PolyhedronMesh& polyhedron) {
     
     for (unsigned int i = 0; i < polyhedron.NumCell2Ds; i++) {
@@ -249,9 +249,6 @@ bool check_area_3d(PolyhedronMesh& polyhedron) {
     cout << "There are no zero area polygons" << endl;
     return true;
 }
-	
 */
-
-
 /***************************************/
 
