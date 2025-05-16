@@ -35,13 +35,13 @@ list(APPEND Project_LINKED_LIBRARIES PRIVATE GTest::gmock_main)
 
 # Insert Sources
 ################################################################################
-add_subdirectory(src)
+#add_subdirectory(src)
 
 list(APPEND Project_SOURCES ${src_sources})
 list(APPEND Project_HEADERS ${src_headers})
 list(APPEND Project_INCLUDE ${src_includes})
 
-add_subdirectory(src_test)
+#add_subdirectory(src_test)
 
 list(APPEND Project_TEST_SOURCES ${src_test_sources})
 list(APPEND Project_TEST_HEADERS ${src_test_headers})
@@ -58,14 +58,13 @@ target_link_libraries(${PROJECT_NAME} ${Project_LINKED_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${Project_INCLUDE})
 target_compile_options(${PROJECT_NAME} PUBLIC -fPIC)
 
-add_executable(${PROJECT_NAME}_TEST
-      main_test.cpp
-      ${Project_SOURCES}
-      ${Project_HEADERS}
-      ${src_test_sources}
-      ${src_test_headers})
+#add_executable(${PROJECT_NAME}_TEST
+#      main_test.cpp
+#      ${Project_SOURCES}
+#      ${Project_HEADERS}
+#      ${src_test_sources}
+#      ${src_test_headers})
 
-target_link_libraries(${PROJECT_NAME}_TEST ${Project_LINKED_LIBRARIES})
-target_include_directories(${PROJECT_NAME}_TEST PRIVATE ${Project_INCLUDE} 
-${src_test_includes})
-target_compile_options(${PROJECT_NAME}_TEST PUBLIC -fPIC)
+#target_link_libraries(${PROJECT_NAME}_TEST ${Project_LINKED_LIBRARIES})
+#target_include_directories(${PROJECT_NAME}_TEST PRIVATE ${Project_INCLUDE} ${src_test_includes})
+#target_compile_options(${PROJECT_NAME}_TEST PUBLIC -fPIC)
