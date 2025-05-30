@@ -154,7 +154,7 @@ int main(int n_arginput, char *argv[])
 		
 		
 	} else if (p == 4 && q == 3) {
-		//nel caso q=3 devo restituire il poliedro duale
+		//per q=3 mi deve restituire il duale -> cubo
 		cout << "The platonic polyhedron corresponding to {" << p << "," << q << "} is a cube" << endl;
 		InputFile += "/octahedron/";
 		
@@ -192,32 +192,45 @@ int main(int n_arginput, char *argv[])
 		
 		
 		
-		
-		
-		
+			
 	
 	} else if (p == 5 && q == 3) {
 		// Dodecaedro ottenuto come duale dell'icosaedro
-		cout << "The platonic polyhedron {" << p << "," << q << "} (dodecahedron) will be constructed as dual of {3,5}" << endl;
 		InputFile += "/icosahedron/";
+		
+		PolyhedronMesh Geodetic;
+		PolyhedronMesh DualPolyhedron;
 
 		if (!ImportPolyhedronMesh(Platonic, InputFile)) {
 			cerr << "Error: creation of the icosahedron mesh not done" << endl;
 			return 1;
 		}
 
-		PolyhedronMesh Geodetic;
-		PolyhedronMesh DualPolyhedron;
 		Duale(Platonic, DualPolyhedron);  // dodecaedro
 		cout << "Dodecahedron mesh generated via dual of icosahedron." << endl;
 
 		if (class_1) {
-			//GenerateGeodedicSolid_Class1(DualPolyhedron, Geodetic, n, E, F);
+			GenerateGeodedicSolid_Class1(DualPolyhedron, Geodetic, n, E, F);
 			cout << "Geodetic solid generated from dodecahedron (dual of icosahedron)." << endl;
 		} else {
 			cout << "Class II construction not yet implemented." << endl;
 		} 
-	
+		
+		Duale(Geodetic, Platonic);  // dodecaedro
+		
+		//CREAZIONE FILE OUTPUT.TXT
+		string outCell0Ds = "Goldberg_Cell0Ds.txt";
+		ExportCell0Ds(Platonic, outCell0Ds);
+		
+		string outCell1Ds = "Goldberg_Cell1Ds.txt";
+		ExportCell1Ds(Platonic, outCell1Ds);
+		
+		string outCell2Ds = "Goldberg_Cell2Ds.txt";
+		ExportCell2Ds(Platonic, outCell2Ds, p);
+		
+		string outCell3Ds = "Goldberg_Cell3Ds.txt";
+		ExportCell3Ds(Platonic, outCell3Ds);
+		
 	} else {
 		cerr << "Combination {" << p << "," << q << "} not supported yet." << endl;
 		return 1;
