@@ -36,10 +36,11 @@ list(APPEND Project_LINKED_LIBRARIES PRIVATE GTest::gmock_main)
 # Insert Sources
 ################################################################################
 add_subdirectory(src)
+add_subdirectory(ExportParaview)
 
-list(APPEND Project_SOURCES ${src_sources})
-list(APPEND Project_HEADERS ${src_headers})
-list(APPEND Project_INCLUDE ${src_includes})
+list(APPEND Project_SOURCES ${src_sources} ${src_paraview_sources})
+list(APPEND Project_HEADERS ${src_headers} ${src_paraview_headers})
+list(APPEND Project_INCLUDE ${src_includes} ${src_paraview_includes})
 
 add_subdirectory(src_test)
 

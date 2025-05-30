@@ -310,8 +310,38 @@ bool ExportCell3Ds(PolyhedronMesh& polyhedron, const string& OutputFile)
 /*********************************************************************************************************************/
 
 
-bool GenerateGeodedicSolid_Class1(const PolyhedronMesh& Platonic, PolyhedronMesh& Geodetic, const int& n, const int& E, const int& F)
+bool GenerateGeodedicSolid_Class1(const PolyhedronMesh& Platonic, PolyhedronMesh& Geodetic, const int& n)
 {
+
+    if(n == 1)
+    {
+        Geodetic = Platonic;
+        return true;
+    }
+
+    int T = n * n;
+
+    int E = 0; int F = 0;
+    if (Platonic.Cell2DsId.size() == 4)
+    {
+        E = 6 * T;
+        F = 4 * T;
+    }
+    else if (Platonic.Cell2DsId.size() == 8) {
+        E = 12 * T;
+        F = 8 * T;
+    }
+    else if (Platonic.Cell2DsId.size() == 20) {
+        E = 30 * T;
+        F = 20 * T;
+    }
+    else
+    {
+        return false;
+    }
+
+
+
 	int point_id = 0;
 	int duplicate_id = 0;
 	int edge_id = 0;
@@ -404,7 +434,7 @@ bool GenerateGeodedicSolid_Class1(const PolyhedronMesh& Platonic, PolyhedronMesh
 	
 	//ripulisco la matrice togliendo le colonne nulle a causa dei puplicati
 	Geodetic.Cell0DsCoordinates.conservativeResize(3, Geodetic.NumCell0Ds);
-	ProjectonPointToSphere(Geodetic.Cell0DsCoordinates);
+    // ProjectonPointToSphere(Geodetic.Cell0DsCoordinates);
 	
 	
 	//LATI E FACCIA 

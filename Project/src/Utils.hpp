@@ -25,7 +25,7 @@ bool ExportCell2Ds(PolyhedronMesh& polyhedron, const string& OutputFile, const i
 
 bool ExportCell3Ds(PolyhedronMesh& polyhedron, const string& OutputFile);
 
-bool GenerateGeodedicSolid_Class1(const PolyhedronMesh& Platonic, PolyhedronMesh& Geodetic, const int& n, const int& E, const int& F);
+bool GenerateGeodedicSolid_Class1(const PolyhedronMesh& Platonic, PolyhedronMesh& Geodetic, const int& n);
 	
 bool Check_Duplicates_Vertex(const MatrixXd& matrice, const Vector3d& vector, int& edge_check_id, int& duplicate_id);
 
