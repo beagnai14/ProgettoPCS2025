@@ -47,6 +47,8 @@ list(APPEND Project_TEST_SOURCES ${src_test_sources})
 list(APPEND Project_TEST_HEADERS ${src_test_headers})
 list(APPEND Project_TEST_INCLUDE ${src_test_includes})
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/SolidiPlatonici DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 # Create executable
 ################################################################################
 add_executable(${PROJECT_NAME}
