@@ -24,3 +24,19 @@ bool ExportCell1Ds(PolyhedronMesh& polyhedron, const string& OutputFile);
 bool ExportCell2Ds(PolyhedronMesh& polyhedron, const string& OutputFile, const int& p);
 
 bool ExportCell3Ds(PolyhedronMesh& polyhedron, const string& OutputFile);
+
+bool GenerateGeodedicSolid_Class1(const PolyhedronMesh& Platonic, PolyhedronMesh& Geodetic, const int& n, const int& E, const int& F);
+
+//bool GenerateGeodedicSolid_Class2(const PolyhedronMesh& Platonic, PolyhedronMesh& Geodetic, const int& b, const int& E, const int& F);
+	
+bool Check_Duplicates_Vertex(const MatrixXd& matrice, const Vector3d& vector, int& edge_check_id, int& duplicate_id);
+
+bool CheckDuplicates_Edge(const MatrixXi& matrice, const int& v1, const int& v2, int& edge_check_id, int& duplicate_id);
+
+bool ProjectonPointToSphere(MatrixXd& vertices);
+
+bool Duale(PolyhedronMesh& InitialPolyhedron, PolyhedronMesh& DualPolyhedron);
+
+vector<int> OrderFaceAroundVertex(const MatrixXd& Coordinates, const vector<int>& unordered_faces);
+
+vector<int> Short_Path( const PolyhedronMesh& Platonic, const int& id_1, const int& id_2);
