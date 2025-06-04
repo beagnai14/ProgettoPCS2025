@@ -48,7 +48,7 @@ namespace PolyhedronLibrary{
 				listLines.push_back(line);
 			file.close();
 			
-			// Remove header
+			// Rimozione header
 			listLines.pop_front();
 			
 			polyhedron.NumCell0Ds = listLines.size();
@@ -96,7 +96,7 @@ namespace PolyhedronLibrary{
 			
 			file.close();
 			
-			// Remove header
+			// Rimozione header
 			listLines.pop_front();
 			
 			polyhedron.NumCell1Ds = listLines.size();
@@ -122,7 +122,7 @@ namespace PolyhedronLibrary{
 				is_line >> id >> separatore >> Origin >> separatore >> End;
 				
 				
-				// TEST: verify edge zero-length
+				// TEST: verificare se un lato ha lunghezza nulla
 				if(Origin == End){
 					cerr <<"TEST NOT PASSED: the edge "<< id <<" has length equal to zero";
 					return false;
@@ -157,7 +157,7 @@ namespace PolyhedronLibrary{
 			
 			file.close();
 			
-			// remove header
+			// rimozione header
 			listLines.pop_front();
 			
 			polyhedron.NumCell2Ds = listLines.size();
@@ -316,11 +316,12 @@ namespace PolyhedronLibrary{
 
 	/*********************************************************************************************************************/
 
-	namespace GenerateGeodedic {
+	namespace GeneratePlatonic {
 	
 		bool Solid_Class1(const PolyhedronMesh& Platonic, PolyhedronMesh& Geodetic, const int& n)
 		{
-
+			
+			//n=1 allora non bisogna fare triangolazione
 			if(n == 1)
 			{
 				Geodetic = Platonic;
@@ -394,18 +395,7 @@ namespace PolyhedronLibrary{
 						Vector3d PointCoordinates =  (double(a) / n) * V1 + (double(b) / n) * V2 + (double(c) / n) * V3;
 										
 						//aggiorno la chiave
-						array<int, 4> coefficients = {a, b, c, id};            
-						
-						//verifico la stampa dei dati 
-						//NOTA->eliminare alla fine *** !!!
-						cout << "Coefficiente baricentrico (a, b, c) sulla faccia ID " << coefficients[3] << ":\n";
-						cout << "  a = " << coefficients[0] << ", b = " << coefficients[1] << ", c = " << coefficients[2] << endl;
-						cout << "Coordinate punto: (" 
-						<< PointCoordinates(0) << ", " 
-						<< PointCoordinates(1) << ", " 
-						<< PointCoordinates(2) << ")" << endl;
-						cout << endl;
-						
+						array<int, 4> coefficients = {a, b, c, id};            				
 											
 						//controllo duplicati: se il punto è nuovo viene aggiunto
 						if (!Check_Duplicates_Vertex(Geodetic.Cell0DsCoordinates, PointCoordinates, point_id, duplicate_id)){
@@ -414,35 +404,18 @@ namespace PolyhedronLibrary{
 							Geodetic.Cell0DsId.push_back(point_id);								//salvo id nelle CelleOd
 							Geodetic.Cell0DsCoordinates.col(point_id) = PointCoordinates;		//aggiorno la matrice delle coordinate: x, y, z
 												
-
-							//verifico la stampa dei dati 
-							//NOTA->eliminare alla fine *** !!!
-							cout << "[Nuovo Punto] ID: " << point_id << " sulla faccia ID " << id << endl;
-							cout << "  Coefficienti (a, b, c): " << a << ", " << b << ", " << c << endl;
-							cout << "  Coordinate: (" << PointCoordinates.transpose() << ")" << endl << endl;
-
-							
 							point_id++;
 							Geodetic.NumCell0Ds++;
 							
-							} else {
-								point_informations[coefficients] = duplicate_id;	
-								
-								//verifico la stampa dei dati 
-								//NOTA->eliminare alla fine *** !!!
-								cout << "[Duplicato] Punto già esistente con ID: " << duplicate_id << " sulla faccia ID " << coefficients[3] << endl;
-								cout << "  Coefficienti (a, b, c): "
-								<< coefficients[0] << ", " << coefficients[1] << ", " << coefficients[2] << endl;
-								cout << "  Coordinate: (" << PointCoordinates.transpose() << ")" << endl;
-								cout<<endl;
-							}	
+							} else 
+								point_informations[coefficients] = duplicate_id;		
 						}	
 					}
 			}
 			
 			//ripulisco la matrice togliendo le colonne nulle a causa dei puplicati
 			Geodetic.Cell0DsCoordinates.conservativeResize(3, Geodetic.NumCell0Ds);
-			// ProjectonPointToSphere(Geodetic.Cell0DsCoordinates);
+			ProjectonPointToSphere(Geodetic.Cell0DsCoordinates);
 			
 			
 			//LATI E FACCIA 
@@ -462,16 +435,7 @@ namespace PolyhedronLibrary{
 						Geodetic.Cell2DsNumEdges[face_id] = 3;						//id=* ha sempre 3 lati perchè si ottiene un traingolo		
 						vector<int> VerticesVector = {V1, V2, V3};					//vertici della nuova mini-faccia
 						Geodetic.Cell2DsVertices[face_id] = VerticesVector;
-						Geodetic.Cell2DsEdges[face_id].resize(3);						//spazio per i lati della faccia id=*
-						
-						
-						
-						cout << "Faccia 🔺 " << face_id << " (punta in ALTO) ha come vertici: ";
-						for (int v : Geodetic.Cell2DsVertices[face_id]) {
-						cout << v << " ";
-						}
-						cout << endl;
-						
+						Geodetic.Cell2DsEdges[face_id].resize(3);					//spazio per i lati della faccia id=*
 						
 						
 						//LATI triangolo punta in sù
@@ -484,7 +448,7 @@ namespace PolyhedronLibrary{
 								End_Vertex = Geodetic.Cell2DsVertices[face_id][k+1];	//vertice successivo
 							
 							if (edge_id > E) {
-							std::cerr << "[ERRORE] edge_id fuori limite: " << edge_id << " >= " << E << std::endl;
+							cerr << "[ERRORE] edge_id fuori limite: " << edge_id << " >= " << E << endl;
 							return false;
 							}
 							
@@ -504,8 +468,7 @@ namespace PolyhedronLibrary{
 						
 						
 						//secondo tipo di trinagolo: punta in basso
-						//il triangolo con la punta in basso viene eseguito dalla seconda iterazione del ciclo for esterno
-						//perchè partendo dal vertice V1 in alto si tratta di un triangolo con la punta in sù
+						//il triangolo con la punta in basso viene eseguito dalla seconda iterazione del ciclo
 						if(i > 0){
 							
 							int V4 = point_informations[{i-1, n-(i-1)-(j+1), (j+1), id}];			
@@ -517,14 +480,7 @@ namespace PolyhedronLibrary{
 							VerticesVector[2] = V4; 										//sostituisco V3
 							Geodetic.Cell2DsVertices[face_id] = VerticesVector;
 							Geodetic.Cell2DsEdges[face_id].resize(3);
-							
-							cout << "Faccia 🔻 " << face_id << " (punta in BASSO) ha come vertici: ";
-							for (int v : Geodetic.Cell2DsVertices[face_id]) {
-							cout << v << " ";
-							}
-							cout << endl;
-							
-												
+											
 							for (int k = 0; k < 3; k++) {
 								int Origin_Vertex = Geodetic.Cell2DsVertices[face_id][k];
 								int End_Vertex;
@@ -568,8 +524,7 @@ namespace PolyhedronLibrary{
 			return true;
 		}
 
-
-
+		
 		/***************************************************************************************************************************************/
 
 
@@ -617,15 +572,6 @@ namespace PolyhedronLibrary{
 				
 				DualPolyhedron.Cell0DsId.push_back(centroid_id);
 				
-				
-				//CONTROLLO OUTPUT -> eliminare alla fine
-				std::cout << "Faccia DUALE " << i << ":\n";
-				std::cout << "  Vertice 1: (" << V1(0) << ", " << V1(1) << ", " << V1(2) << ")\n";
-				std::cout << "  Vertice 2: (" << V2(0) << ", " << V2(1) << ", " << V2(2) << ")\n";
-				std::cout << "  Vertice 3: (" << V3(0) << ", " << V3(1) << ", " << V3(2) << ")\n";
-				std::cout << "  Baricentro: (" << centroid(0) << ", " << centroid(1) << ", " << centroid(2) << ")\n\n";
-				
-				
 				/*aggiorno le coordinate: il centroide diventa il vertice del duale
 				associo centroid(x,y,z) alle cell0ds.coordinate*/
 				DualPolyhedron.Cell0DsCoordinates.col(i) = centroid;
@@ -655,27 +601,11 @@ namespace PolyhedronLibrary{
 					}
 				}
 			
-			
-				//CONTROLLO -> eliminare alla fine
-				//controllo stampa vettore non ordinato
-				cout << "VETTORE NON ORDINATO DELLE FACCE" << endl;
-				cout << "Vertice " << v_id << " è condiviso dalle facce: ";
-				for (int id : adjacent_faces) {
-					cout << id << " ";
-				}
-				cout << endl;
-				
-				
 				//a questo punto si sono ottenute tutte le facce che condividono un vertice nel poliedro originale
 				//sono però in ordine casuale quindi devono essere ordinate in modo da creare un poligono che si chiudi.
 				
 				vector<int> ordered = OrderFaceAroundVertex(DualPolyhedron.Cell0DsCoordinates, adjacent_faces);
 				adjacent_new_faces.push_back(ordered);
-			
-				//controllo stampa vettore ordinato -> eliminare
-				cout << "adjacent_new_faces: " << v_id << ": ";
-				for (int val : ordered) cout << val << " ";
-				cout << endl;
 			
 				//Creazione dei lati
 				int valence = ordered.size();   //numero di facce adiacenti al vertice: non è sempre 3
@@ -684,14 +614,6 @@ namespace PolyhedronLibrary{
 				for (size_t i = 0; i < ordered.size(); i++) {
 					Dual_vertices.push_back(Face_Centroid_Id[ordered[i]]);
 				}
-				
-				
-				// DEBUG: stampa dei vertici della faccia duale  -> eliminare
-				cout << "Faccia duale con ID " << face_id << " ha " << valence << " vertici: ";
-				for (const auto& v : Dual_vertices) cout << v << " ";
-				cout << endl;
-				//
-				
 				
 				//aggiorno struttura dati
 				DualPolyhedron.Cell2DsId.push_back(face_id);
@@ -710,10 +632,6 @@ namespace PolyhedronLibrary{
 					else
 						End_Vertex = DualPolyhedron.Cell2DsVertices[face_id][k+1];
 					
-					// DEBUG: stampa info lato
-					cout << "  Lato " << k << ": da vertice " << Origin_Vertex << " a vertice " << End_Vertex;
-
-					
 					if(!CheckDuplicates_Edge(DualPolyhedron.Cell1DsExtrema, Origin_Vertex, End_Vertex, edge_id, duplicate_id)){
 						DualPolyhedron.NumCell1Ds++;
 						DualPolyhedron.Cell1DsId.push_back(edge_id);
@@ -721,32 +639,15 @@ namespace PolyhedronLibrary{
 						DualPolyhedron.Cell1DsExtrema(1, edge_id) = End_Vertex;
 						DualPolyhedron.Cell2DsEdges[face_id][k] = edge_id;
 						
-						//STAMPA PER CONTROLLO
-						cout << " → Nuovo lato con ID " << edge_id << endl;
-						
-						
 						edge_id++;
-						} else {
+						} else
 							DualPolyhedron.Cell2DsEdges[face_id][k] = DualPolyhedron.Cell1DsId[duplicate_id];    
-
-							//STAMPA PER CONTROLLO
-							cout << " → Lato già esistente con ID " << DualPolyhedron.Cell1DsId[duplicate_id] << endl;
-						}
 				}
 				face_id++;
 			}
 			
 			ProjectonPointToSphere(DualPolyhedron.Cell0DsCoordinates);
-			
-			cout << "PROIEZIONE SULLA SFERA DEL DUALE" << endl;
-			for (int i = 0; i < DualPolyhedron.Cell0DsCoordinates.cols(); ++i) {
-			Vector3d pt = DualPolyhedron.Cell0DsCoordinates.col(i);
-			std::cout << "Vertice " << i << ": (" 
-			<< pt(0) << ", " << pt(1) << ", " << pt(2) << ")\n";  }
-			
-			
-			
-			
+						
 			DualPolyhedron.Cell1DsExtrema.conservativeResize(2, DualPolyhedron.NumCell1Ds);
 			DualPolyhedron.Cell2DsNumVertices.resize(DualPolyhedron.NumCell2Ds);
 			DualPolyhedron.Cell2DsNumEdges.resize(DualPolyhedron.NumCell2Ds);
@@ -777,7 +678,7 @@ namespace PolyhedronLibrary{
 	{
 		for(int i = 0; i < vertex_check_id; i++){
 			
-			if( (matrice.col(i) - vector).norm() < 1e-16 ){
+			if( (matrice.col(i) - vector).norm() < 1e-12 ){
 				duplicate_id = i;
 				return true;
 			}
@@ -812,13 +713,9 @@ namespace PolyhedronLibrary{
 			Vector3d Coordinate_xyz = vertices.col(i);			//coordinate della triangolazione
 			double norm = Coordinate_xyz.norm();				//norma euclidea
 			
-			cout << "Punto " << i << " originale: " << Coordinate_xyz.transpose() << ", norma = " << norm << endl;
-			
-			if (norm > 1e-16) {									//se è dievrsa da zero
+			if (norm > 1e-12) {									//se è dievrsa da zero
 				vertices.col(i) = Coordinate_xyz / norm;		//normalizzo -> proietto sulla sfera
 			}
-			
-			cout << "Punto " << i << " proiettato: " << vertices.col(i).transpose() << endl;
 		}
 		return true;
 	}
@@ -921,20 +818,8 @@ namespace PolyhedronLibrary{
 			adjacent_list.push_back(adjacent_vertex);
 		}
 
-		//CONTROLLO STAMPA -> eliminare alla fine
-		for (size_t i = 0; i < adjacent_list.size(); ++i) {
-		std::cout << "Vertice " << i << " è adiacente a: ";
-		for (size_t j = 0; j < adjacent_list[i].size(); ++j) {
-			std::cout << adjacent_list[i][j];
-			if (j < adjacent_list[i].size() - 1)
-				std::cout << ", ";
-		}
-		std::cout << std::endl;
-		}
-		//
 		
-		
-		//gestisico il caso banale di BFS
+		//gestisico il caso banale
 		if(id_1 == id_2){
 			path.reserve(1);
 			path.push_back(id_1);
@@ -943,7 +828,7 @@ namespace PolyhedronLibrary{
 		}
 		
 		
-		//altri casi di BFS
+		//altri casi
 		const int N = Platonic.NumCell0Ds;
 		vector<bool> reached(N, false);
 		vector<int> parent(N,N);
@@ -982,14 +867,14 @@ namespace PolyhedronLibrary{
 		reverse(path.begin(), path.end());
 		
 
-		//STAMPA NECESSARIA! -> NON ELIMINARE
+		//STAMPA: cammino minimo
 		cout<<"Path: ";
 		for(size_t i=0; i<path.size(); i++){
 			cout<<path[i]<<' ';
 		}
 		cout<<endl;
 		
-		//STAMPA NECESSARIA numero di lati del cammino minimo
+		//STAMPA: numero di lati del cammino minimo
 		cout<<"The shortest path between " << id_1 <<" and " << id_2 <<" has "<<(path.size()-1) << " number of edges "<<endl;
 		
 		double length = 0.0;

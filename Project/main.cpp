@@ -2,8 +2,8 @@
 #include <fstream>
 #include <unordered_set>
 #include <iostream>
-#include<vector>
-#include<cmath>
+#include <vector>
+#include <cmath>
 
 #include "PolyhedronMesh.hpp"
 #include "UCDUtilities.hpp"
@@ -11,6 +11,7 @@
 
 using namespace std;
 using namespace Gedim;
+using namespace PolyhedronLibrary;
 
 
 int main(int n_arginput, char *argv[])   
@@ -76,8 +77,8 @@ int main(int n_arginput, char *argv[])
     if (n_arg >=4 && n_arg < 6) {
         cout << "(p, q, b, c) = (" << p << ", " << q << ", " << b << ", " << c << ")" << endl;
 
-    } else if (n_arg >=7) {
-        cout << "(p, q, b, c, id_vertex11, id_vertex2) = (" << p << ", " << q << ", " << b << ", " << c << ", " << id_vertex1 << ", " << id_vertex2 << ")" << endl;
+    } else if (n_arg >=6) {
+        cout << "(p, q, b, c, id_vertex1, id_vertex2) = (" << p << ", " << q << ", " << b << ", " << c << ", " << id_vertex1 << ", " << id_vertex2 << ")" << endl;
     }
 
 
@@ -108,16 +109,16 @@ int main(int n_arginput, char *argv[])
 
         PolyhedronMesh Geodetic;
 
-        if (!ImportPolyhedronMesh(Geodetic, InputFile)) {
+        if (!ImportFile::ImportPolyhedronMesh(Geodetic, InputFile)) {
             cerr << "Error: creation of the platonic polyhedron mesh not done" << endl;
             return 1;
         }
 
 
-        if (class_1) {
-            GenerateGeodedicSolid_Class1(Geodetic, Platonic, n);
+        if (class_1 == true) {
+            GeneratePlatonic::Solid_Class1(Geodetic, Platonic, n);
             cout << "Geodetic polyhedron generated." << endl;
-        } else {
+        } else if (class_2 == true) {
             cout << "Class II construction not yet implemented." << endl;
         }
 
@@ -137,20 +138,20 @@ int main(int n_arginput, char *argv[])
         PolyhedronMesh Geodetic;
         PolyhedronMesh DualPolyhedron;
 
-        if (!ImportPolyhedronMesh(DualPolyhedron, InputFile)) {
-            cerr << "Error: creation of the octahedron mesh not done" << endl;
+        if (!ImportFile::ImportPolyhedronMesh(DualPolyhedron, InputFile)) {
+            cerr << "Error: creation of the DualPolyhedron mesh not done" << endl;
             return 1;
         }
 
-        if (class_1) {
-            GenerateGeodedicSolid_Class1(DualPolyhedron, Geodetic, n);
-            cout << "Geodetic solid generated from cube (dual of octahedron)." << endl;
-        } else {
+        if (class_1 == true) {
+            GeneratePlatonic::Solid_Class1(DualPolyhedron, Geodetic, n);
+            cout << "Dual polyhedron generated." << endl;
+        } else if (class_2 == true) {
             cout << "Class II construction not yet implemented." << endl;
         }
 
-        Duale(Geodetic, Platonic);  // cubo
-        cout << "Cube mesh generated via dual of octahedron." << endl;
+        GeneratePlatonic::Duale(Geodetic, Platonic);  // cubo
+        cout << "Dual mesh generated." << endl;
 
     } else {
         cerr << "Combination {" << p << "," << q << "} not supported yet." << endl;
@@ -205,174 +206,33 @@ int main(int n_arginput, char *argv[])
 
     //CREAZIONE FILE OUTPUT.TXT 
     string outCell0Ds = "Cell0Ds.txt";
-    ExportCell0Ds(Platonic, outCell0Ds);
+    ExportFile::ExportCell0Ds(Platonic, outCell0Ds);
+	cout << "Generated file: " << outCell0Ds << endl;
 
     string outCell1Ds = "Cell1Ds.txt";
-    ExportCell1Ds(Platonic, outCell1Ds);
+    ExportFile::ExportCell1Ds(Platonic, outCell1Ds);
+	cout << "Generated file: " << outCell1Ds << endl;
 
     string outCell2Ds = "Cell2Ds.txt";
-    ExportCell2Ds(Platonic, outCell2Ds, p);
+    ExportFile::ExportCell2Ds(Platonic, outCell2Ds, p);
+	cout << "Generated file: " << outCell2Ds << endl;
 
     string outCell3Ds = "Cell3Ds.txt";
-    ExportCell3Ds(Platonic, outCell3Ds);
+    ExportFile::ExportCell3Ds(Platonic, outCell3Ds);
+	cout << "Generated file: " << outCell3Ds << endl;
+	
 
 	//CREAZIONE FILE OUTPUT.INP 
 	utilities.ExportPoints("./Cell0Ds.inp",
                                Platonic.Cell0DsCoordinates);
+	cout << "Generated file: " << "Cell0Ds.inp" << endl;
 							   
 	utilities.ExportSegments("./Cell1Ds.inp",
                                  Platonic.Cell0DsCoordinates,
                                  Platonic.Cell1DsExtrema);
+	cout << "Generated file: " << "Cell1Ds.inp" << endl;
 							   
 							   
-	
-	
-	
-	
-	
-	
-	/*
-    UCDUtilities utilities;
-
-	//ESPORTAZIONE VERTICI PARAVIEW
-	vector<double> markers0D(Platonic.NumCell0Ds, 0.0); ///////////////
-	for(const auto &m : Platonic.MarkerCell0Ds)
-             for(const unsigned int id: m.second)
-                 cell0Ds_marker.at(id) = m.first;
-			 
-	vector<UCDProperty<double>> cell0Ds_properties(1);////
-    cell0Ds_properties[0].Label = "Marker";
-    cell0Ds_properties[0].UnitLabel = "-";
-    cell0Ds_properties[0].NumComponents = 1;
-    cell0Ds_properties[0].Data = markers0D.data();
-	
-	utilities.ExportPoints("./Cell0Ds.inp", Platonic.Cell0DsCoordinates, cell0Ds_properties);
-	
-	//ESPORTAZIONE LATI PARAVIEW
-	vector<double> markers1D(Platonic.NumCell1Ds, 0.0); ////////////////
-	for(const auto &m : Platonic.MarkerCell1Ds)
-             for(const unsigned int id: m.second)
-                 cell1Ds_marker.at(id) = m.first;
-	
-    vector<UCDProperty<double>> cell1Ds_properties(1);/////////
-    cell1Ds_properties[0].Label = "Marker";
-    cell1Ds_properties[0].UnitLabel = "-";
-    cell1Ds_properties[0].NumComponents = 1;
-    cell1Ds_properties[0].Data = markers1D.data();
-
-    utilities.ExportSegments("./Cell1Ds.inp", Platonic.Cell0DsCoordinates, Platonic.Cell1DsExtrema, points_properties, cell1Ds_properties);
-	*/
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	/*PROF
-    UCDUtilities utilities;
-    {
-		//ESPORTAZIONE PUNTI 
-         vector<UCDProperty<double>> cell0Ds_properties(1);
-
-         cell0Ds_properties[0].Label = "Short_Path";
-         cell0Ds_properties[0].UnitLabel = "-"; 		
-         cell0Ds_properties[0].NumComponents = 1;		
-		
-         vector<double> cell0Ds_marker(Platonic.NumCell0Ds, 0.0);
-         for(const auto &m : Platonic.MarkerCell0Ds)
-             for(const unsigned int id: m.second)
-                 cell0Ds_marker.at(id) = m.first;
-		
-         cell0Ds_properties[0].Data = cell0Ds_marker.data();
-
-        utilities.ExportPoints("./Cell0Ds.inp",
-                               Platonic.Cell0DsCoordinates);
-							   
-							   
-    }
-
-    {
-		//ESPORTAZIONE LATI
-         vector<UCDProperty<double>> points_properties(1);
-
-        points_properties[0].Label = "Short_Path";
-        points_properties[0].UnitLabel = "-";
-        points_properties[0].NumComponents = 1;
-
-        vector<double> cell0Ds_marker(Platonic.NumCell0Ds, 0.0);
-        for(const auto &m : Platonic.MarkerCell0Ds)
-             for(const unsigned int id: m.second)
-                 cell0Ds_marker.at(id) = m.first;
-
-         points_properties[0].Data = cell0Ds_marker.data();
-		 
-		 utilities.ExportPoints("./Cell0Ds.inp", 
-								Platonic.Cell0DsCoordinates, 
-								cell0Ds_properties);
-
-		
-         vector<UCDProperty<double>> cell1Ds_properties(1);
-
-         cell1Ds_properties[0].Label = "Marker";
-         cell1Ds_properties[0].UnitLabel = "-";
-         cell1Ds_properties[0].NumComponents = 1;
-
-         vector<double> cell1Ds_marker(Platonic.NumCell1Ds, 0.0);
-         for(const auto &m : Platonic.MarkerCell1Ds)
-             for(const unsigned int id: m.second)
-                 cell1Ds_marker.at(id) = m.first;
-		
-         cell1Ds_properties[0].Data = cell1Ds_marker.data();
-
-        utilities.ExportSegments("./Cell1Ds.inp",
-                                 Platonic.Cell0DsCoordinates,
-                                 Platonic.Cell1DsExtrema);
-    }
-	*/
 	
 
     return 0;
