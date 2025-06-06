@@ -16,15 +16,12 @@ namespace PolyhedronLibrary{
 		bool ImportPolyhedronMesh(PolyhedronMesh& polyhedron, const string& InputFile){
 			
 			if(!ImportCell0Ds(polyhedron,InputFile+"Cell0Ds.csv")) { 
-				cerr << "File Cell0Ds.csv not found" << endl;
 				return false; }
 			
 			if(!ImportCell1Ds(polyhedron,InputFile+"Cell1Ds.csv")) {
-				cerr << "File Cell1Ds.csv not found" << endl;
 				return false; }
 			
 			if(!ImportCell2Ds(polyhedron,InputFile+"Cell2Ds.csv")) {
-				cerr << "File Cell2Ds.csv not found" << endl;
 				return false; }
 			
 			return true;
@@ -57,6 +54,7 @@ namespace PolyhedronLibrary{
 				return false;
 			}
 			
+			// allocazione memoria
 			polyhedron.Cell0DsId.reserve(polyhedron.NumCell0Ds);
 			polyhedron.Cell0DsCoordinates = MatrixXd::Zero(3,polyhedron.NumCell0Ds);
 			
@@ -106,7 +104,7 @@ namespace PolyhedronLibrary{
 				return false;
 			}
 			
-			// salvo le informazioni nelle righe in polyhedron	
+			// allocazione memoria
 			polyhedron.Cell1DsId.reserve(polyhedron.NumCell1Ds);
 			polyhedron.Cell1DsExtrema = MatrixXi::Zero(2, polyhedron.NumCell1Ds);
 			
@@ -167,10 +165,12 @@ namespace PolyhedronLibrary{
 				return false;
 			}
 			
-			// salvo le informazioni nelle righe in polyhedron
+			//allocazione memoria
 			polyhedron.Cell2DsId.reserve(polyhedron.NumCell2Ds);
 			polyhedron.Cell2DsVertices.reserve(polyhedron.NumCell2Ds);
+			polyhedron.Cell2DsNumVertices.assign(polyhedron.NumCell2Ds, 3);
 			polyhedron.Cell2DsEdges.reserve(polyhedron.NumCell2Ds);
+			polyhedron.Cell2DsNumEdges.assign(polyhedron.NumCell2Ds, 3);
 			
 			for (const string& line : listLines){
 				
@@ -211,7 +211,7 @@ namespace PolyhedronLibrary{
 			
 			outCell0Ds << "Id;X;Y;Z" << endl;
 			
-			for (int i = 0; i < polyhedron.NumCell0Ds; ++i) {
+			for (int i = 0; i < polyhedron.NumCell0Ds; i++) {
 				int id = polyhedron.Cell0DsId[i];
 				outCell0Ds << id << ";"
 					<< polyhedron.Cell0DsCoordinates(0, id) << ";"
@@ -236,7 +236,7 @@ namespace PolyhedronLibrary{
 			
 			outCell1Ds << "Id;Origin;End" << endl;
 			
-			for (int i = 0; i < polyhedron.NumCell1Ds; ++i) {
+			for (int i = 0; i < polyhedron.NumCell1Ds; i++) {
 				int id = polyhedron.Cell1DsId[i];
 				outCell1Ds << id << ";"
 					<< polyhedron.Cell1DsExtrema(0, id) << ";"
@@ -260,17 +260,17 @@ namespace PolyhedronLibrary{
 			
 			outCell2Ds << "Id;NumVertex;Vertex;NumEdges;Edge" << endl;
 			
-			for (int i = 0; i < polyhedron.NumCell2Ds; ++i) {
+			for (int i = 0; i < polyhedron.NumCell2Ds; i++) {
 				
 				int id = polyhedron.Cell2DsId[i];
 				outCell2Ds << id << ";" << p << ";";
 				
-				for (unsigned int j = 0; j < polyhedron.Cell2DsVertices[i].size(); j++) {
+				for (size_t j = 0; j < polyhedron.Cell2DsVertices[i].size(); j++) {
 					outCell2Ds << polyhedron.Cell2DsVertices[i][j] << ";" ;
 				}
 				
 				outCell2Ds << p << ";" ;
-				for (unsigned int j = 0; j < polyhedron.Cell2DsEdges[i].size(); j++) {
+				for (size_t j = 0; j < polyhedron.Cell2DsEdges[i].size(); j++) {
 					outCell2Ds << polyhedron.Cell2DsEdges[i][j] << ";" ;
 				}
 			outCell2Ds << endl;	
@@ -291,10 +291,10 @@ namespace PolyhedronLibrary{
 				return false;
 			}	
 			
-			outCell3Ds << "Id;NumVertex;NumEdges;NumFaces;Vertex;Edge;Faces" << endl;
+			outCell3Ds << "Id;NumVertex;Vertex;NumEdges;Edge;NumFaces;Faces" << endl;
 			
 			outCell3Ds << 0 << ";" << polyhedron.NumCell0Ds << ";" ;
-			for (int i = 0; i < polyhedron.NumCell0Ds; ++i) {
+			for (int i = 0; i < polyhedron.NumCell0Ds; i++) {
 				outCell3Ds << i << ";" ;
 			}
 				
@@ -528,7 +528,7 @@ namespace PolyhedronLibrary{
 		/***************************************************************************************************************************************/
 
 
-		bool Duale(PolyhedronMesh& InitialPolyhedron, PolyhedronMesh& DualPolyhedron) {
+		bool Duale(const PolyhedronMesh& InitialPolyhedron, PolyhedronMesh& DualPolyhedron) {
 			
 			int centroid_id = 0;
 			int edge_id = 0;
@@ -549,8 +549,8 @@ namespace PolyhedronLibrary{
 			DualPolyhedron.Cell1DsExtrema = MatrixXi::Zero(2, DualPolyhedron.NumCell1Ds);
 			
 			//Cell2Ds
+			DualPolyhedron.NumCell2Ds = InitialPolyhedron.NumCell0Ds;								//facce <-> vertici originalic
 			DualPolyhedron.Cell2DsId.reserve(DualPolyhedron.NumCell2Ds);
-			DualPolyhedron.NumCell2Ds = InitialPolyhedron.NumCell0Ds;								//facce <-> vertici originali
 			DualPolyhedron.Cell2DsEdges.resize(DualPolyhedron.NumCell2Ds);
 			DualPolyhedron.Cell2DsNumEdges.resize(DualPolyhedron.NumCell2Ds);
 			DualPolyhedron.Cell2DsVertices.resize(DualPolyhedron.NumCell2Ds);
@@ -574,7 +574,7 @@ namespace PolyhedronLibrary{
 				
 				/*aggiorno le coordinate: il centroide diventa il vertice del duale
 				associo centroid(x,y,z) alle cell0ds.coordinate*/
-				DualPolyhedron.Cell0DsCoordinates.col(i) = centroid;
+				DualPolyhedron.Cell0DsCoordinates.col(centroid_id) = centroid;
 
 				Face_Centroid_Id[i] = centroid_id;						//aggiorno la mappa
 				centroid_id++;
@@ -618,12 +618,13 @@ namespace PolyhedronLibrary{
 				//aggiorno struttura dati
 				DualPolyhedron.Cell2DsId.push_back(face_id);
 				DualPolyhedron.Cell2DsVertices[face_id] = Dual_vertices;
+				
 				DualPolyhedron.Cell2DsEdges[face_id].resize(valence);
-						
 				DualPolyhedron.Cell2DsNumVertices[face_id] = valence;
 				DualPolyhedron.Cell2DsNumEdges[face_id] = valence; 
 
 				
+				//CREAZIONE SPIGOLI DEL DUALE
 				for (int k = 0; k < valence; k++) {
 					int Origin_Vertex = DualPolyhedron.Cell2DsVertices[face_id][k];
 					int End_Vertex;
@@ -732,7 +733,7 @@ namespace PolyhedronLibrary{
 			return ordered_faces; 
 		}
 		
-		//baricentro della faccia
+		//baricentro dei centroidi delle facce
 		Vector3d baricenter = Vector3d::Zero();
 		
 		
@@ -795,9 +796,18 @@ namespace PolyhedronLibrary{
 	vector<int> Short_Path ( const PolyhedronMesh& Platonic, const int& id_1, const int& id_2) {
 		
 		vector<int> path;
-
-		//creazione della lista di adiacenza per rappresentare il grafo
 		
+		//gestisico il caso banale
+		if(id_1 == id_2){
+			path.reserve(1);
+			path.push_back(id_1);
+			cout << "Id_1 = id_2" << endl; 
+			cout<<"The path between " << id_1 <<" and " << id_2 <<" has 0 number of edges "<<endl;
+			cout<<"The path between "<< id_1 <<" and " << id_2 <<" is 0 long" <<endl;
+			return path;
+		}
+		
+		// altrimenti: creazione della lista di adiacenza per rappresentare il grafo
 		vector<vector<int>> adjacent_list;
 		adjacent_list.reserve(Platonic.NumCell0Ds);
 																												
@@ -818,25 +828,15 @@ namespace PolyhedronLibrary{
 			adjacent_list.push_back(adjacent_vertex);
 		}
 
-		
-		//gestisico il caso banale
-		if(id_1 == id_2){
-			path.reserve(1);
-			path.push_back(id_1);
-			cout << "Id_1=id_2" << endl; 
-			return path;
-		}
-		
-		
-		//altri casi
+	
 		const int N = Platonic.NumCell0Ds;
 		vector<bool> reached(N, false);
 		vector<int> parent(N,N);
 		queue<int> Q;
 		
-		Q.push(id_1);				//coda
+		Q.push(id_1);				//aggiungo alla coda il vertice di partenza
 		reached[id_1] = true; 		//nodo di partenza visitato
-		parent[id_1] = N;
+		parent[id_1] = N;			//parente = valore sentinella
 		
 		bool end_path = false;
 		while (!Q.empty() && !end_path) {

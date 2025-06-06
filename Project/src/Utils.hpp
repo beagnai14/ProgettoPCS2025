@@ -88,7 +88,7 @@ namespace PolyhedronLibrary {
 				
 			
 		// Costruzione del poliedro duale a partire dal solido di partenza.
-		bool Duale(PolyhedronMesh& InitialPolyhedron, 
+		bool Duale(const PolyhedronMesh& InitialPolyhedron, 
 									PolyhedronMesh& DualPolyhedron);
 	}
 	

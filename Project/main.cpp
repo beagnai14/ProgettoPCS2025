@@ -1,6 +1,6 @@
-#include <sstream>
 #include <fstream>
 #include <unordered_set>
+#include <string> 
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -115,10 +115,10 @@ int main(int n_arginput, char *argv[])
         }
 
 
-        if (class_1 == true) {
+        if (class_1) {
             GeneratePlatonic::Solid_Class1(Geodetic, Platonic, n);
             cout << "Geodetic polyhedron generated." << endl;
-        } else if (class_2 == true) {
+        } else if (class_2) {
             cout << "Class II construction not yet implemented." << endl;
         }
 
@@ -126,11 +126,13 @@ int main(int n_arginput, char *argv[])
         switch (p)
         {
         case 4:
-            cout << "The platonic polyhedron corresponding to {" << p << "," << q << "} is an octahedron" << endl;
+            cout << "The platonic polyhedron corresponding to {" << p << "," << q << "} is a cube" << endl;
+			cout << "The octahedron is the dual of the cube" << endl;
             InputFile += "/octahedron/";
             break;
         case 5:
-            cout << "The platonic polyhedron corresponding to {" << p << "," << q << "} is an icosahedron" << endl;
+            cout << "The platonic polyhedron corresponding to {" << p << "," << q << "} is a dodecahedron" << endl;
+			cout << "The dodecahedron is the dual of the icosahedron " << endl;
             InputFile += "/icosahedron/";
             break;
         }
@@ -143,14 +145,14 @@ int main(int n_arginput, char *argv[])
             return 1;
         }
 
-        if (class_1 == true) {
+        if (class_1) {
             GeneratePlatonic::Solid_Class1(DualPolyhedron, Geodetic, n);
             cout << "Dual polyhedron generated." << endl;
-        } else if (class_2 == true) {
+        } else if (class_2) {
             cout << "Class II construction not yet implemented." << endl;
         }
 
-        GeneratePlatonic::Duale(Geodetic, Platonic);  // cubo
+        GeneratePlatonic::Duale(Geodetic, Platonic);  
         cout << "Dual mesh generated." << endl;
 
     } else {
@@ -224,12 +226,15 @@ int main(int n_arginput, char *argv[])
 
 	//CREAZIONE FILE OUTPUT.INP 
 	utilities.ExportPoints("./Cell0Ds.inp",
-                               Platonic.Cell0DsCoordinates);
+                               Platonic.Cell0DsCoordinates,
+							   cell0Ds_properties);
 	cout << "Generated file: " << "Cell0Ds.inp" << endl;
 							   
 	utilities.ExportSegments("./Cell1Ds.inp",
                                  Platonic.Cell0DsCoordinates,
-                                 Platonic.Cell1DsExtrema);
+                                 Platonic.Cell1DsExtrema,
+								 cell0Ds_properties,
+								 cell1Ds_properties);
 	cout << "Generated file: " << "Cell1Ds.inp" << endl;
 							   
 							   
