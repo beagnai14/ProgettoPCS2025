@@ -1,0 +1,39 @@
+@startuml
+actor User
+participant "Solid_Class2 (Class II)" as SC2
+participant "Solid_Class1 (Class I)" as SC1
+
+User -> SC2 : Solid_Class2(Platonic, Geodetic, n)
+
+SC2 -> SC1 : legge vertici e facce base
+SC2 --> SC2 : inizializza ID punti, edge, facce
+SC2 --> SC2 : alloca memoria per punti, edge, facce
+
+loop su ogni faccia di Platonic
+    SC2 -> SC2 : calcola punti interpolati (coordinate baricentriche)
+    SC2 -> SC2 : controlla duplicati e assegna ID
+    SC2 -> SC2 : aggiorna mappa punti e coordinate
+end
+
+loop su ogni faccia di Platonic
+    SC2 -> SC2 : crea baricentri e archi da baricentri a vertici
+    SC2 -> SC2 : controlla duplicati archi e assegna ID
+    SC2 -> SC2 : crea nuove facce triangolari
+    alt Differenze rispetto a classe 1
+        note right
+            - Inserimento di archi e facce aggiuntive
+            - Controlli duplicati più complessi
+            - Costruzione di facce doppie per ogni lato
+        end note
+    else
+        note right
+            - Solo triangolazione base senza facce extra
+        end note
+    end
+end
+
+SC2 -> SC2 : ridimensiona matrici finali
+SC2 -> SC2 : proietta punti sulla sfera
+SC2 -> SC2 : aggiorna dati celle 3D (poliedro completo)
+SC2 -> User : ritorna Geodetic completo
+@enduml

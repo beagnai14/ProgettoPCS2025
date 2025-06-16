@@ -1,0 +1,45 @@
+@startuml
+skinparam sequenceMessageAlign center
+skinparam style strictuml
+skinparam sequenceParticipant underline
+
+participant "GeneratePlatonic" as Gen
+participant "CheckDuplicates_Edge" as CDE
+participant "ProjectonPointToSphere" as PPS
+
+Gen -> PPS : ProjectonPointToSphere()
+
+loop per faccia in Platonic
+    loop triangoli interni
+        Gen -> Gen : Calcola V1, V2, V3
+        Gen -> Gen : Aggiungi triangolo "punta su"
+
+        loop 3 lati
+            Gen -> CDE : CheckDuplicates_Edge(...)
+            alt nuovo lato
+                Gen -> Gen : aggiungi lato
+            else
+                Gen -> Gen : usa lato duplicato
+            end
+        end
+
+        alt triangolo "punta giù"
+            Gen -> Gen : Calcola V4, aggiorna vertici
+            Gen -> Gen : Aggiungi secondo triangolo
+
+            loop 3 lati
+                Gen -> CDE : CheckDuplicates_Edge(...)
+                alt nuovo lato
+                    Gen -> Gen : aggiungi lato
+                else
+                    Gen -> Gen : usa duplicato
+                end
+            end
+        end
+    end
+end
+
+Gen -> Gen : resize matrici e vettori finali
+Gen -> Gen : aggiunge dati in Cell3Ds
+return true
+@enduml

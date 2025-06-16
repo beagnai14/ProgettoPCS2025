@@ -1,0 +1,44 @@
+@startuml
+skinparam sequenceMessageAlign center
+skinparam style strictuml
+skinparam sequenceParticipant underline
+
+actor Caller
+participant "GeneratePlatonic" as Gen
+participant "CheckDuplicates_Edge" as CDE
+participant "ProjectonPointToSphere" as PPS
+participant "OrderFaceAroundVertex" as OFAV
+
+Caller -> Gen : Duale()
+
+Gen -> Gen : Inizializza id e struttura dati
+Gen -> Gen : NumCell0Ds = NumCell2Ds (scambio vertici-facce)
+Gen -> Gen : NumCell2Ds = NumCell0Ds
+
+loop per faccia in InitialPolyhedron
+    Gen -> Gen : Calcola baricentro
+    Gen -> Gen : Aggiungi come vertice del duale
+end
+
+loop per vertice in InitialPolyhedron
+    Gen -> Gen : Trova facce adiacenti
+
+    Gen -> OFAV : OrderFaceAroundVertex(...)
+
+    Gen -> Gen : Costruisci faccia del duale
+    loop per lato della faccia
+        Gen -> CDE : CheckDuplicates_Edge(...)
+        alt nuovo lato
+            Gen -> Gen : aggiungi lato
+        else
+            Gen -> Gen : usa lato duplicato
+        end
+    end
+end
+
+Gen -> PPS : ProjectonPointToSphere()
+
+Gen -> Gen : resize vettori finali
+Gen -> Gen : aggiorna Cell3Ds
+return true
+@enduml

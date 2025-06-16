@@ -299,12 +299,12 @@ namespace PolyhedronLibrary{
 			}
 				
 			 outCell3Ds << polyhedron.NumCell1Ds << ";" ;
-			 for (int i = 0; i < polyhedron.NumCell1Ds; ++i) {
+			 for (int i = 0; i < polyhedron.NumCell1Ds; i++) {
 				outCell3Ds << i <<  ";" ;
 			 }
 			 
 			 outCell3Ds << polyhedron.NumCell2Ds << ";";
-			 for (int i = 0; i < polyhedron.NumCell2Ds; ++i) {
+			 for (int i = 0; i < polyhedron.NumCell2Ds; i++) {
 				outCell3Ds << i <<  ";" ;
 			}
 			
@@ -435,6 +435,7 @@ namespace PolyhedronLibrary{
 						Geodetic.Cell2DsNumEdges[face_id] = 3;						//id=* ha sempre 3 lati perchè si ottiene un traingolo		
 						vector<int> VerticesVector = {V1, V2, V3};					//vertici della nuova mini-faccia
 						Geodetic.Cell2DsVertices[face_id] = VerticesVector;
+						
 						Geodetic.Cell2DsEdges[face_id].resize(3);					//spazio per i lati della faccia id=*
 						
 						

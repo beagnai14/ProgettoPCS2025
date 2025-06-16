@@ -1,0 +1,46 @@
+@startuml
+title Short_Path Sequence Diagram
+skinparam sequenceMessageAlign center
+skinparam style strictuml
+skinparam sequenceParticipant underline
+
+actor Caller
+participant "GeneratePlatonic" as Gen
+
+Caller -> Gen : Short_Path(Platonic, id_1, id_2)
+
+Gen -> Gen : Crea lista adiacenza da Cell1DsExtrema
+
+alt id_1 == id_2
+    Gen -> Gen : path.push_back(id_1)
+    Gen -> Gen : stampa "Id_1=id_2"
+else
+    Gen -> Gen : Inizializza reached, parent, Q
+    Gen -> Gen : Q.push(id_1)
+
+    loop while Q non vuota e path non trovato
+        Gen -> Gen : current = Q.front(), Q.pop()
+
+        loop per neighbour in adjacent_list[current]
+            alt neighbour non visitato
+                Gen -> Gen : reached[neighbour] = true
+                Gen -> Gen : parent[neighbour] = current
+                Gen -> Gen : Q.push(neighbour)
+
+                alt neighbour == id_2
+                    Gen -> Gen : end_path = true
+                    break
+                end
+            end
+        end
+    end
+
+    Gen -> Gen : Ricostruzione path con parent[]
+    Gen -> Gen : reverse(path)
+    Gen -> Gen : stampa path
+    Gen -> Gen : calcola lunghezza geometrica
+    Gen -> Gen : stampa lunghezza
+end
+
+Caller <-- Gen : path
+@enduml

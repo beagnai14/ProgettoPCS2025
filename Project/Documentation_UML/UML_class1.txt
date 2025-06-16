@@ -1,0 +1,40 @@
+@startuml
+title Solid_Class1 Sequence Diagram - Parte 1
+skinparam sequenceMessageAlign center
+skinparam style strictuml
+skinparam sequenceParticipant underline
+
+actor Caller
+participant "GeneratePlatonic" as Gen
+participant "Check_Duplicates_Vertex" as CDV
+participant "ProjectonPointToSphere" as PPS
+
+Caller -> Gen : Solid_Class1(Platonic, Geodetic, n)
+
+alt n == 1
+    Gen -> Gen : Geodetic = Platonic
+    return true
+else
+    Gen -> Gen : Calcola T = n*n
+    Gen -> Gen : Calcola E, F in base a Platonic
+    Gen -> Gen : Alloca memoria vettori/matrici
+
+    loop per faccia in Platonic
+        Gen -> Gen : V1, V2, V3 = vertici faccia
+
+        loop triangolazione baricentrica
+            Gen -> Gen : calcola (a,b,c)
+            Gen -> Gen : calcola PointCoordinates
+
+            Gen -> CDV : Check_Duplicates_Vertex(...)
+            alt nuovo punto
+                Gen -> Gen : aggiungi a Geodetic
+            else
+                Gen -> Gen : usa punto duplicato
+            end
+        end
+    end
+
+    Gen -> PPS : ProjectonPointToSphere()
+end
+@enduml

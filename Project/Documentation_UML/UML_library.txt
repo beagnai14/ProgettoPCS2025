@@ -1,0 +1,94 @@
+@startuml
+left to right direction
+skinparam classAttributeIconSize 0
+
+package "PolyhedronLibrary" {
+
+  struct PolyhedronMesh {
+    + int  NumCell0Ds
+    + vector<int> Cell0DsId 
+    + MatrixXd Cell0DsCoordinates 
+    
+    + int NumCell1Ds
+    + vector<int> Cell1DsId 
+    + MatrixXi Cell1DsExtrema 
+    
+    + int NumCell2Ds
+    + vector<int> Cell2DsId 
+    + vector<vector<int>> Cell2DsVertices
+    + vector<vector<int>> Cell2DsEdges
+    + vector<int> Cell2DsNumVertices
+    + vector<int> Cell2DsNumEdges
+  
+    + int NumCell3Ds
+    + vector<int> Cell3DsId
+    + vector<int> Cell3DsNumVertices
+    + vector<int> Cell3DsNumEdges
+    + vector<int> Cell3DsNumFaces
+    + vector<vector<int>> Cell3DsVertices
+    + vector<vector<int>> Cell3DsEdges
+    + vector<vector<int>> Cell3DsFaces
+  }
+
+
+ class ImportFile <<Library>> {
+    # ImportPolyhedronMesh()
+    # ImportCell0Ds()
+    # ImportCell1Ds()
+    # ImportCell2Ds()
+  }
+
+  class ExportFile <<Library>> {
+    # ExportCell0Ds()
+    # ExportCell1Ds()
+    # ExportCell2Ds()
+    # ExportCell3Ds()
+  }
+  
+  
+  class GeneratePlatonic <<Library>> {
+    # Solid_Class1()
+    # Duale()
+  }
+
+ 
+  class Functions {
+    # Check_Duplicates_Vertex()
+    # bool CheckDuplicates_Edge()
+    # bool ProjectonPointToSphere()
+    # std::vector<int> OrderFaceAroundVertex()
+    # std::vector<int> Short_Path()
+  }
+
+  PolyhedronMesh -[hidden]right-> Functions
+  Functions .up.> PolyhedronMesh : uses
+}
+
+package "GoogleTest" {
+
+  class GoogleTest {
+    + TEST(PolyhedronTest, CheckDuplicatesVertex_Found)
+    + TEST(PolyhedronTest, CheckDuplicatesVertex_NotFound)
+    + TEST(ShortPathTest, BasicShortPath)
+    + TEST(ShortPathTest, SameVertexShortPath)
+    + TEST(InputValidationTest, ValidatePAndQ)
+    + TEST(InputValidationTest, ValidateBandC)
+    + TEST(InputValidationTest, ValidateVertexIDs)
+    + TEST(DualClassITest, GenerateDualClassI)
+  }
+
+}
+
+class "Eigen Library" <<Library>>
+
+PolyhedronMesh --> "Eigen Library" : uses
+"GoogleTest" --> "Google Test Library" : uses
+"GoogleTest" --> Functions : tests
+
+PolyhedronMesh --> ImportFile
+PolyhedronMesh --> ExportFile
+PolyhedronMesh --> GeneratePlatonic
+PolyhedronMesh --> Functions
+
+
+@enduml
